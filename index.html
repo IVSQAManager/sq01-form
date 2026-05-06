@@ -315,7 +315,7 @@
       </div>
       <div>
         <label>Supplier Number <span style="font-size:0.78rem;color:var(--sub);">(IVS-assigned, if known)</span></label>
-        <input type="text" id="supplier_number" placeholder="e.g. V-0042">
+        <input type="text" id="supplier_number" placeholder="e.g. V-0042" readonly style="background:#f0f4f8;color:#64748b;cursor:default;" title="IVS-assigned — not editable by vendor">
       </div>
     </div>
 
@@ -662,6 +662,16 @@ function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   state.currentPage = pageId;
+  if (pageId === 'page-declare') {
+    const n = (document.getElementById('completed_by')?.value || '').trim();
+    const t = (document.getElementById('completed_by_title')?.value || '').trim();
+    const dn = document.getElementById('declare_name');
+    const dt = document.getElementById('declare_title');
+    const st = document.getElementById('sig_typed');
+    if (dn && !dn.value) dn.value = n;
+    if (dt && !dt.value) dt.value = t;
+    if (st && !st.value && n) { st.value = n; renderTypedSig(); }
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
   updateProgress();
 }
