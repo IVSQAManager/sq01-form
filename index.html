@@ -495,7 +495,7 @@
 
     <div class="nav-row">
       <button class="btn btn-secondary" onclick="goBack()">← Back</button>
-      <button class="btn btn-success" onclick="generatePackage()">📄 Generate &amp; Download SQ-01 Package</button>
+      <button class="btn btn-success" id="submitBtn" onclick="generatePackage()">Submit Qualification →</button>
     </div>
   </div>
 </div>
@@ -506,18 +506,11 @@
 <div class="page" id="page-success">
   <div class="card success-box">
     <div class="check">✅</div>
-    <h2>Thank You!</h2>
-    <p>Your Supplier Qualification Assessment has been successfully generated and downloaded as a <strong>.json</strong> file.</p>
-    <p>Please click the below email to open a pre-filled email and attach the downloaded file to it:<br>
-    <a id="mailto-link" href="#" onclick="openMailto(event)"
-       style="font-size:1.1rem;font-weight:800;color:var(--accent);text-decoration:none;">
-      📧 qaqc@infinityvalve.com
-    </a></p>
-    <p style="font-size:0.9rem;color:var(--sub);">Our Quality Management Team will review your submission. If any further information is required or if there is an issue with the form, we will contact you within 5–10 business days. <em>(Please note: Approved suppliers are not typically notified.)</em></p>
-    <p style="font-size:0.8rem;color:var(--sub);margin-top:10px;">Keep a copy of the downloaded file for your records. Do not modify it — altered files cannot be imported into our system.</p>
-    <div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.82rem;color:#1d4ed8;">
-      <strong>Tip:</strong> Clicking the email address above will open your default email app with the address pre-filled. Simply attach the <strong>.json</strong> file that was just downloaded and send.
-    </div>
+    <h2>Submission Received!</h2>
+    <p style="font-size:1rem;">Your Supplier Qualification Assessment has been successfully submitted to <strong>Infinity Valve &amp; Supply</strong>. You're all done!</p>
+    <p style="font-size:0.92rem;color:var(--sub);margin-top:12px;">Our Quality Management Team will review your submission. If any additional information is required, we will reach out within <strong>5–10 business days</strong>.</p>
+    <p style="font-size:0.82rem;color:var(--sub);margin-top:10px;font-style:italic;">Approved suppliers are not typically notified — approval is reflected in the purchase order process.</p>
+    <p style="font-size:0.82rem;margin-top:16px;">Questions? <a href="mailto:qaqc@infinityvalve.com" style="color:var(--accent);">qaqc@infinityvalve.com</a></p>
   </div>
 </div>
 
@@ -1092,10 +1085,13 @@ function isSigEmpty() {
   return !data.some(v => v !== 0);
 }
 
+// ── Submission endpoint — update this URL when tunnel changes ──
+const IVS_SUBMIT_URL = 'https://announcements-riders-blues-newfoundland.trycloudflare.com/api/ingest_sq01';
+
 // ═══════════════════════════════════════════════════════════
-//  GENERATE PACKAGE & DOWNLOAD
+//  SUBMIT TO IVS
 // ═══════════════════════════════════════════════════════════
-function generatePackage() {
+async function generatePackage() {
   // Validate declare page
   const name = document.getElementById('declare_name').value.trim();
   const title = document.getElementById('declare_title').value.trim();
@@ -1154,30 +1150,29 @@ function generatePackage() {
     }
   };
 
-  // Serialize and download
-  const blob = new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const safeName = pkg.company.name.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
-  const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  a.href = url;
-  a.download = `SQ-01_${safeName}_${dateStr}.json`;
-  // Store filename for mailto link
-  state._lastDownloadFile = `SQ-01_${safeName}_${dateStr}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-
-  navigateTo('page-success');
-}
-
-function openMailto(e) {
-  e.preventDefault();
-  const fname = state._lastDownloadFile || 'your .json file';
-  const subject = encodeURIComponent('SQ-01 Supplier Qualification Submission');
-  const body = encodeURIComponent(
-    'Hello,\n\nPlease find my completed SQ-01 Supplier Qualification Assessment attached (' + fname + ').\n\nThank you.'
-  );
-  window.location.href = `mailto:qaqc@infinityvalve.com?subject=${subject}&body=${body}`;
+  // Submit directly to IVS
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerText = 'Submitting…';
+  try {
+    const res = await fetch(IVS_SUBMIT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pkg)
+    });
+    const data = await res.json();
+    if (data.success) {
+      navigateTo('page-success');
+    } else {
+      alert('Submission error: ' + (data.error || 'Unknown error.') + '\n\nPlease try again or contact qaqc@infinityvalve.com.');
+      btn.disabled = false;
+      btn.innerText = 'Submit Qualification →';
+    }
+  } catch(e) {
+    alert('Could not reach the submission server.\n\nPlease try again or contact qaqc@infinityvalve.com if the issue persists.');
+    btn.disabled = false;
+    btn.innerText = 'Submit Qualification →';
+  }
 }
 
 function getPillValue(groupId) {
