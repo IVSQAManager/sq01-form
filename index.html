@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQ-01 Supplier Qualification — Infinity Valve & Supply</title>
+<style>
+  :root {
+    --primary: #0f172a; --accent: #0ea5e9; --success: #10b981;
+    --danger: #ef4444; --warn: #f59e0b; --border: #e2e8f0;
+    --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --sub: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+
+  .header { background: var(--primary); color: white; padding: 16px 30px; display: flex; align-items: center; gap: 16px; }
+  .header img { height: 40px; }
+  .header-text h1 { margin: 0; font-size: 1.2rem; font-weight: 800; }
+  .header-text p { margin: 2px 0 0; font-size: 0.8rem; opacity: 0.7; }
+
+  .progress-bar { background: #1e293b; padding: 8px 30px; }
+  .progress-track { background: rgba(255,255,255,0.15); border-radius: 99px; height: 6px; }
+  .progress-fill { background: var(--accent); height: 6px; border-radius: 99px; transition: width 0.4s; }
+  .progress-label { color: rgba(255,255,255,0.6); font-size: 0.75rem; margin-top: 4px; }
+
+  .page { max-width: 760px; margin: 30px auto; padding: 0 16px 60px; display: none; }
+  .page.active { display: block; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+  .section-tag { display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; }
+  .card h2 { margin: 0 0 4px; font-size: 1.2rem; }
+  .card p.desc { margin: 0 0 20px; color: var(--sub); font-size: 0.9rem; line-height: 1.5; }
+
+  label { display: block; font-weight: 600; font-size: 0.88rem; margin: 14px 0 4px; color: var(--text); }
+  label .req { color: var(--danger); margin-left: 2px; }
+
+  input[type=text], input[type=email], input[type=tel], input[type=url], select, textarea {
+    width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 6px;
+    font-size: 0.95rem; font-family: inherit; outline: none; color: var(--text); background: white;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media(max-width:560px) { .row-2, .row-3 { grid-template-columns: 1fr; } }
+
+  /* Pill choice buttons */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .pill { padding: 7px 18px; border: 2px solid var(--border); border-radius: 99px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; background: white; color: var(--sub); transition: 0.15s; user-select: none; }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.selected-yes { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+  .pill.selected-no { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+  .pill.selected-na { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
+  .pill.selected-opt { border-color: var(--accent); background: #e0f2fe; color: #0369a1; }
+
+  /* Classification cards */
+  .class-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 10px; }
+  @media(max-width:560px) { .class-grid { grid-template-columns: 1fr; } }
+  .class-card { border: 2px solid var(--border); border-radius: 10px; padding: 18px 14px; cursor: pointer;
+    text-align: center; transition: 0.2s; background: white; }
+  .class-card:hover { border-color: var(--accent); }
+  .class-card.selected { border-color: var(--accent); background: #e0f2fe; }
+  .class-card .icon { font-size: 2rem; margin-bottom: 8px; }
+  .class-card h3 { margin: 0 0 4px; font-size: 0.95rem; font-weight: 800; }
+  .class-card p { margin: 0; font-size: 0.78rem; color: var(--sub); line-height: 1.4; }
+
+  /* Audit question rows */
+  .audit-q { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid #f1f5f9; gap: 16px; }
+  .audit-q:last-child { border-bottom: none; }
+  .audit-q .q-text { flex: 1; font-size: 0.88rem; line-height: 1.5; }
+  .audit-q .q-pills { display: flex; gap: 6px; flex-shrink: 0; }
+  .audit-q .q-pills .pill { padding: 5px 12px; font-size: 0.8rem; }
+
+  /* Risk matrix */
+  .risk-matrix { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 10px; }
+  .risk-matrix th { background: #f1f5f9; padding: 8px 6px; text-align: center; font-weight: 700;
+    border: 1px solid var(--border); color: var(--sub); }
+  .risk-matrix th:first-child { text-align: left; width: 42%; }
+  .risk-matrix td { border: 1px solid var(--border); padding: 8px 6px; vertical-align: middle; }
+  .risk-matrix td:first-child { font-size: 0.83rem; line-height: 1.4; }
+  .risk-matrix td.center { text-align: center; cursor: pointer; transition: 0.15s; }
+  .risk-matrix td.center:hover { background: #e0f2fe; }
+  .risk-matrix td.center.chosen { background: var(--accent); color: white; font-weight: 800; border-radius: 4px; }
+
+  /* Location block */
+  .location-block { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 12px; position: relative; background: #fafbfc; }
+  .location-block .loc-title { font-weight: 800; font-size: 0.88rem; color: var(--sub); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .remove-loc { position: absolute; top: 10px; right: 12px; background: none; border: none;
+    color: var(--danger); font-size: 1.2rem; cursor: pointer; line-height: 1; }
+
+  /* File upload */
+  .file-drop { border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center;
+    cursor: pointer; transition: 0.2s; background: #fafbfc; }
+  .file-drop:hover, .file-drop.dragover { border-color: var(--accent); background: #e0f2fe; }
+  .file-drop input { display: none; }
+  .file-list { margin-top: 8px; }
+  .file-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px;
+    background: #f1f5f9; border-radius: 5px; margin-top: 4px; font-size: 0.85rem; }
+  .file-item button { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1rem; }
+
+  /* Signature canvas */
+  .sig-wrap { border: 2px dashed #cbd5e1; border-radius: 8px; background: white; padding: 8px; margin-top: 8px; }
+  .sig-wrap canvas { display: block; width: 100%; touch-action: none; cursor: crosshair; }
+  .sig-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .sig-actions button { font-size: 0.78rem; padding: 4px 10px; border: 1px solid var(--border);
+    border-radius: 5px; cursor: pointer; background: white; }
+
+  /* Navigation */
+  .nav-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn { padding: 12px 28px; border-radius: 7px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
+    border: none; transition: 0.2s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #0284c7; }
+  .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--border); }
+  .btn-secondary:hover { background: #f1f5f9; }
+  .btn-success { background: var(--success); color: white; flex: 1; font-size: 1rem; }
+  .btn-success:hover { background: #059669; }
+
+  .hidden { display: none !important; }
+  .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 3px; display: none; }
+  .field-error input, .field-error select, .field-error textarea { border-color: var(--danger); }
+  .field-error .error-msg { display: block; }
+
+  /* Download / success screen */
+  .success-box { text-align: center; padding: 40px 20px; }
+  .success-box .check { font-size: 4rem; margin-bottom: 16px; }
+  .success-box h2 { font-size: 1.5rem; margin-bottom: 10px; }
+  .success-box p { color: var(--sub); margin-bottom: 24px; line-height: 1.6; }
+
+  .info-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;
+    font-size: 0.85rem; color: #1d4ed8; margin-bottom: 20px; line-height: 1.5; }
+
+  /* Conditional section reveal */
+  .cond-block { margin-top: 14px; }
+
+  /* Product/service selection */
+  .product-option { display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+    border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.15s; background: white; }
+  .product-option:hover { border-color: var(--accent); background: #f0f9ff; }
+  .product-option input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+  .product-option.checked { border-color: var(--accent); background: #e0f2fe; }
+  .product-option.checked-critical { border-color: #ef4444; background: #fef2f2; }
+  .opt-label { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-text">
+    <h1>Infinity Valve &amp; Supply</h1>
+    <p>SQ-01 — Supplier Qualification &amp; Risk Assessment &nbsp;|&nbsp; Rev. 0 &nbsp;|&nbsp; 04/01/2026</p>
+    <p style="font-size:0.7rem;opacity:0.5;margin:0;">Replaces Form-5.6.1-1 and Form-5.6.1-2</p>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-label" id="progressLabel">Getting started…</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE WELCOME — Instructions
+═══════════════════════════════════════════════════ -->
+<div class="page active" id="page-welcome">
+  <div class="card">
+    <div id="welcome-new">
+      <div class="section-tag">New Supplier Assessment</div>
+      <h2>Welcome to the Infinity Valve &amp; Supply, LLC<br>Supplier Qualification Assessment</h2>
+      <p class="desc" style="margin-top:12px;">This SQ-01 form is designed to streamline our vendor onboarding and evaluation process. Please review the following instructions carefully to ensure a smooth and accurate submission.</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#e0f2fe;color:#0369a1;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">1</div>
+          <div><strong>Getting Started</strong><br><span style="font-size:0.87rem;color:var(--sub);">Click the "Start" button below to begin. You will first be prompted to select the primary product or service your company provides. If your specific offering is not listed, please select "Other" and provide a brief description.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#e0f2fe;color:#0369a1;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">2</div>
+          <div><strong>Section 1: General Information &amp; Certifications</strong><br><span style="font-size:0.87rem;color:var(--sub);">Please complete all required fields, which are marked with a red asterisk (<span style="color:var(--danger);">*</span>).<br><br><strong>Have an active QMS Certification?</strong> If your organization holds a valid ISO, API, or other recognized Quality Management System (QMS) certification, please upload your active certificates at the bottom of this section. Uploading valid certificates exempts you from having to complete Section 2.<br><br><strong>No active certification?</strong> If you do not hold formal, active certificates, please proceed to and complete Section 2.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#e0f2fe;color:#0369a1;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">3</div>
+          <div><strong>Section 3: Self-Assessment Audit</strong><br><span style="font-size:0.87rem;color:var(--sub);">This section consists of a brief self-evaluation regarding your internal processes. There are no right or wrong answers; we simply ask that you provide accurate and transparent responses to help us accurately assess your operational capabilities.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#e0f2fe;color:#0369a1;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">4</div>
+          <div><strong>Finalizing Your Submission</strong><br><span style="font-size:0.87rem;color:var(--sub);">Upon completing the form and clicking "Submit," a data file containing your responses (<strong>.json</strong>) will automatically download to your device's default download folder. To finalize your assessment, please attach this file to an email and send it to the address provided on the confirmation screen. The Infinity Valve Quality Management Team requires this specific file to successfully process your vendor qualification.</span></div>
+        </div>
+      </div>
+
+      <p style="margin-top:20px;font-style:italic;font-size:0.88rem;color:var(--sub);">Thank you for your time and cooperation. We look forward to the opportunity to do business with you.</p>
+    </div>
+
+    <div id="welcome-renewal" style="display:none;">
+      <div class="section-tag" style="background:#fef9c3;color:#854d0e;">Renewal Assessment</div>
+      <h2>Infinity Valve &amp; Supply, LLC<br>Supplier Qualification Renewal (SQ-01)</h2>
+      <p class="desc" style="margin-top:12px;">As part of our Quality Management System requirements, it is time for your standard four-year supplier re-evaluation. We value our continued partnership and have streamlined this process to save you time.</p>
+      <p style="font-size:0.87rem;color:var(--sub);">When you click "Start" below, you will find that your form has been pre-populated with the data from your previous assessment. Please follow these brief instructions to complete your renewal:</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#fef9c3;color:#854d0e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">1</div>
+          <div><strong>Verify General Information</strong><br><span style="font-size:0.87rem;color:var(--sub);">Please review Section 1 to ensure your company details, primary contacts, and the services/products you provide are still accurate. Make any necessary updates directly in the fields provided.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#fef9c3;color:#854d0e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">2</div>
+          <div><strong>Update Quality Certifications <em>(Important)</em></strong><br><span style="font-size:0.87rem;color:var(--sub);">If your organization holds an ISO, API, or other recognized QMS certification, please upload your current, active certificates at the bottom of Section 1.<br><br><strong>Note:</strong> If your previous certificates have expired and you do not have active replacements, you will be required to complete Section 2.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#fef9c3;color:#854d0e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">3</div>
+          <div><strong>Review Self-Assessment Responses</strong><br><span style="font-size:0.87rem;color:var(--sub);">If applicable, please review your previous answers in the Section 3 self-audit (and Section 2, if you do not hold active certifications). Ensure these responses still accurately reflect your current internal processes and update any answers as needed.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:#fef9c3;color:#854d0e;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">4</div>
+          <div><strong>Finalize and Submit</strong><br><span style="font-size:0.87rem;color:var(--sub);">Once you have verified all information and attached any updated certificates, click "Submit." A data file named <strong>.json</strong> will automatically download to your device. To finalize your renewal, please attach this file to an email and send it to the address provided on the confirmation screen.</span></div>
+        </div>
+      </div>
+
+      <p style="margin-top:20px;font-style:italic;font-size:0.88rem;color:var(--sub);">Thank you for your time, prompt response, and continued partnership with Infinity Valve &amp; Supply.</p>
+    </div>
+
+    <div class="nav-row" style="margin-top:28px;">
+      <button class="btn btn-primary" style="font-size:1rem;padding:14px 36px;" onclick="startForm()">Start →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 0 — Classification
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-class">
+  <div class="card">
+    <div class="section-tag">Step 1 of 4</div>
+    <h2>What do you supply to Infinity Valve &amp; Supply?</h2>
+    <p class="desc">Select all categories that apply. Your selection determines the classification and which sections of this form you are required to complete.</p>
+
+    <div id="product-options" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+
+      <div style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#991b1b;margin-bottom:2px;">⚙️ Critical Supply</div>
+
+      <label class="product-option" data-class="critical">
+        <input type="checkbox" name="product_type" value="Raw Material / Valve Cores">
+        <span class="opt-label">Raw Material / Valve Cores</span>
+      </label>
+      <label class="product-option" data-class="critical">
+        <input type="checkbox" name="product_type" value="Special Process Services - External">
+        <span class="opt-label">Special Process Services — External (plating, heat treat, coating, NDE)</span>
+      </label>
+      <label class="product-option" data-class="critical">
+        <input type="checkbox" name="product_type" value="Inspection Services">
+        <span class="opt-label">Inspection / Testing Services</span>
+      </label>
+      <label class="product-option" data-class="critical">
+        <input type="checkbox" name="product_type" value="Calibration Services">
+        <span class="opt-label">Calibration Services</span>
+      </label>
+
+      <div style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#475569;margin-top:8px;margin-bottom:2px;">📦 Non-Critical Supply</div>
+
+      <label class="product-option" data-class="noncritical">
+        <input type="checkbox" name="product_type" value="Components">
+        <span class="opt-label">Components (springs, fittings, fasteners, etc.)</span>
+      </label>
+      <label class="product-option" data-class="noncritical">
+        <input type="checkbox" name="product_type" value="Machining / Industrial / Welding Supplies">
+        <span class="opt-label">Machining / Industrial / Welding Supplies</span>
+      </label>
+      <label class="product-option" data-class="noncritical">
+        <input type="checkbox" name="product_type" value="Blasting / Painting / Preservation Supplies">
+        <span class="opt-label">Blasting / Painting / Preservation Supplies</span>
+      </label>
+
+      <div style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#64748b;margin-top:8px;margin-bottom:2px;">📋 Exempt (does not affect product)</div>
+
+      <label class="product-option" data-class="exempt">
+        <input type="checkbox" name="product_type" value="Exempt - IT / Consulting / Freight / Office">
+        <span class="opt-label">IT services, consulting, transportation/freight, office supplies</span>
+      </label>
+
+      <div style="margin-top:8px;">
+        <label class="product-option" data-class="other" style="align-items:flex-start;">
+          <input type="checkbox" name="product_type" value="Other" id="chk_other">
+          <span class="opt-label">Other — please describe:</span>
+        </label>
+        <input type="text" id="other_product_text" placeholder="Describe your product or service..." style="margin-top:6px;display:none;">
+      </div>
+    </div>
+
+    <div id="class-error" class="error-msg" style="display:none; margin-top:10px;">Please select at least one product or service to continue.</div>
+    <div id="class-result" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:0.9rem;"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="submitClassification()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 1 — Company Info
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-info">
+  <div class="card">
+    <div class="section-tag" id="info-step-label">Step 2</div>
+    <h2>Company Information</h2>
+    <p class="desc">Please complete all required fields.</p>
+
+    <div class="row-2">
+      <div>
+        <label>Supplier / Company Name <span class="req">*</span></label>
+        <input type="text" id="company_name" placeholder="Acme Corp">
+        <span class="error-msg">Required</span>
+      </div>
+      <div>
+        <label>Supplier Number <span style="font-size:0.78rem;color:var(--sub);">(IVS-assigned, if known)</span></label>
+        <input type="text" id="supplier_number" placeholder="e.g. V-0042">
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div>
+        <label>Date <span class="req">*</span></label>
+        <input type="text" id="form_date" placeholder="MM/DD/YYYY">
+        <span class="error-msg">Required</span>
+      </div>
+      <div>
+        <label>Email <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="contact@company.com">
+        <span class="error-msg">Required</span>
+      </div>
+    </div>
+
+    <label>Completed By / QA Contact <span class="req">*</span></label>
+    <div class="row-2">
+      <input type="text" id="completed_by" placeholder="Full Name">
+      <input type="text" id="completed_by_title" placeholder="Title / Role">
+    </div>
+
+    <label>Has your company operated under a different name in the last 3 years?</label>
+    <div class="pill-group" id="pills_name_change">
+      <span class="pill" onclick="pillSelect(this,'name_change','Yes')">Yes</span>
+      <span class="pill" onclick="pillSelect(this,'name_change','No')">No</span>
+    </div>
+    <div class="cond-block hidden" id="block_prev_name">
+      <label>Previous company name</label>
+      <input type="text" id="prev_name" placeholder="Previous name">
+    </div>
+
+    <!-- Quality cert — only shown for critical/non-critical -->
+    <div id="block_cert" class="hidden">
+      <label>Is your quality system certified by a nationally/internationally recognized body (API, ISO, etc.)? <span class="req">*</span></label>
+      <div class="pill-group" id="pills_has_cert">
+        <span class="pill" onclick="pillSelect(this,'has_cert','Yes')">Yes</span>
+        <span class="pill" onclick="pillSelect(this,'has_cert','No')">No</span>
+      </div>
+      <div class="cond-block hidden" id="block_cert_details">
+        <label>List certifications (e.g. ISO 9001:2015, API Q1)</label>
+        <input type="text" id="cert_list" placeholder="ISO 9001:2015 — Cert # 12345 — Exp 2027-05-01">
+        <label style="margin-top:12px;">Upload certificate(s)</label>
+        <div class="file-drop" id="certDropZone" onclick="document.getElementById('certFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('dragover')"
+             ondragleave="this.classList.remove('dragover')"
+             ondrop="handleFileDrop(event,'certFiles')">
+          <input type="file" id="certFileInput" accept=".pdf,.jpg,.jpeg,.png,.docx" multiple onchange="handleFileSelect(this,'certFiles')">
+          <div style="font-size:1.5rem;">📎</div>
+          <div style="font-size:0.85rem; color:var(--sub);">Click or drag files here (PDF, JPG, PNG)</div>
+        </div>
+        <div class="file-list" id="certFiles"></div>
+      </div>
+    </div>
+
+    <!-- Additional locations — critical only -->
+    <div id="block_locations" class="hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+        <label style="margin:0;">Additional locations providing products/services?</label>
+        <button class="btn btn-secondary" style="padding:6px 14px; font-size:0.82rem;" onclick="addLocation()">+ Add Location</button>
+      </div>
+      <div id="locations_container"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary" onclick="submitInfo()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 2 — Risk Assessment
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-risk">
+  <div class="card">
+    <div class="section-tag" id="risk-step-label">Step 3</div>
+    <h2>Risk Assessment</h2>
+    <p class="desc">Rate each factor from 1 (Low Risk) to 5 (Very High Risk). Be honest — this helps us plan appropriate support and reduces disruption for both parties.</p>
+
+    <table class="risk-matrix">
+      <thead>
+        <tr>
+          <th>Risk Factor</th>
+          <th>1<br><span style="font-weight:400;font-size:0.7rem;">Low</span></th>
+          <th>2<br><span style="font-weight:400;font-size:0.7rem;">Slight</span></th>
+          <th>3<br><span style="font-weight:400;font-size:0.7rem;">Moderate</span></th>
+          <th>4<br><span style="font-weight:400;font-size:0.7rem;">High</span></th>
+          <th>5<br><span style="font-weight:400;font-size:0.7rem;">Very High</span></th>
+        </tr>
+      </thead>
+      <tbody id="riskTableBody">
+      </tbody>
+    </table>
+    <div id="risk-error" class="error-msg" style="display:none;margin-top:8px;">Please rate all six factors.</div>
+
+    <label style="margin-top:20px;">Comments / additional context (optional)</label>
+    <textarea id="risk_comments" placeholder="Any additional context about your risk profile…"></textarea>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary" onclick="submitRisk()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 3 — Quality System Questionnaire
+     (Critical suppliers WITHOUT cert only)
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-questionnaire">
+  <div class="card">
+    <div class="section-tag">Step 3b — Quality Audit</div>
+    <h2>Quality System Questionnaire</h2>
+    <p class="desc">Answer each question Yes / No / N/A. If you answer No or N/A, add a brief explanation in the Comments box at the end of each section.</p>
+
+    <div class="info-banner">📝 Mark <strong>N/A</strong> for questions that genuinely do not apply to your scope of supply. If you answer <strong>No</strong> to any question, provide an explanation in the Comments field.</div>
+
+    <div id="questionnaireContent"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary" onclick="submitQuestionnaire()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 4 — Declaration & Submit
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-declare">
+  <div class="card">
+    <div class="section-tag" id="declare-step-label">Final Step</div>
+    <h2>Declaration &amp; Signature</h2>
+    <p class="desc">Review your submission and sign below. By signing you certify that all information provided is accurate and complete.</p>
+
+    <div class="info-banner">
+      I certify that the information provided in this Supplier Qualification &amp; Risk Assessment is accurate, complete, and truthful to the best of my knowledge. I understand that Infinity Valve &amp; Supply will use this information to evaluate, classify, and approve our organization as a supplier. I agree to notify IVS promptly of any material changes to our quality system, certifications, or scope of supply.
+    </div>
+
+    <div class="row-2">
+      <div>
+        <label>Printed Name <span class="req">*</span></label>
+        <input type="text" id="declare_name" placeholder="Full Name">
+      </div>
+      <div>
+        <label>Title <span class="req">*</span></label>
+        <input type="text" id="declare_title" placeholder="Title">
+      </div>
+    </div>
+
+    <label>Signature <span class="req">*</span></label>
+    <div style="display:flex;gap:10px;margin-bottom:10px;">
+      <button type="button" id="sig-tab-draw" class="btn btn-primary" style="padding:7px 16px;font-size:0.82rem;" onclick="setSigMode('draw')">✍️ Draw</button>
+      <button type="button" id="sig-tab-type" class="btn btn-secondary" style="padding:7px 16px;font-size:0.82rem;" onclick="setSigMode('type')">⌨️ Type Name</button>
+    </div>
+
+    <div id="sig-draw-area">
+      <div class="sig-wrap">
+        <canvas id="sigCanvas" height="120"></canvas>
+      </div>
+      <div class="sig-actions">
+        <button onclick="clearSig()">Clear Signature</button>
+      </div>
+    </div>
+
+    <div id="sig-type-area" style="display:none;">
+      <input type="text" id="sig_typed" placeholder="Type your full name — this serves as your legal signature"
+             oninput="renderTypedSig()" style="font-size:1.1rem;margin-bottom:8px;">
+      <div id="sig-typed-preview" style="min-height:60px;background:white;border:1px solid var(--border);border-radius:6px;
+           display:flex;align-items:center;padding:10px 16px;font-family:'Brush Script MT',cursive;font-size:1.8rem;
+           color:#0f172a;letter-spacing:1px;"></div>
+      <p style="font-size:0.75rem;color:var(--sub);margin-top:6px;">By typing your name you agree this is your legal electronic signature, equivalent to a handwritten signature.</p>
+    </div>
+
+    <div id="sig-error" class="error-msg" style="margin-top:4px;">Signature is required.</div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-success" onclick="generatePackage()">📄 Generate &amp; Download SQ-01 Package</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 5 — Success
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-success">
+  <div class="card success-box">
+    <div class="check">✅</div>
+    <h2>Thank You!</h2>
+    <p>Your Supplier Qualification Assessment has been successfully generated and downloaded as a <strong>.json</strong> file.</p>
+    <p>Please click the below email to open a pre-filled email and attach the downloaded file to it:<br>
+    <a id="mailto-link" href="#" onclick="openMailto(event)"
+       style="font-size:1.1rem;font-weight:800;color:var(--accent);text-decoration:none;">
+      📧 qaqc@infinityvalve.com
+    </a></p>
+    <p style="font-size:0.9rem;color:var(--sub);">Our Quality Management Team will review your submission. If any further information is required or if there is an issue with the form, we will contact you within 5–10 business days. <em>(Please note: Approved suppliers are not typically notified.)</em></p>
+    <p style="font-size:0.8rem;color:var(--sub);margin-top:10px;">Keep a copy of the downloaded file for your records. Do not modify it — altered files cannot be imported into our system.</p>
+    <div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.82rem;color:#1d4ed8;">
+      <strong>Tip:</strong> Clicking the email address above will open your default email app with the address pre-filled. Simply attach the <strong>.json</strong> file that was just downloaded and send.
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+  classification: null,   // 'critical' | 'noncritical' | 'exempt'
+  hasCert: null,          // true | false
+  currentPage: 'page-class',
+  pageHistory: [],
+  files: { certFiles: [] },
+  riskScores: {},
+  auditAnswers: {},
+  locationCount: 0,
+  prefill: null
+};
+
+const PAGES = ['page-welcome','page-class','page-info','page-risk','page-questionnaire','page-declare','page-success'];
+
+// ═══════════════════════════════════════════════════════════
+//  RISK MATRIX DATA
+// ═══════════════════════════════════════════════════════════
+const RISK_FACTORS = [
+  { id: 'risk_financial',   label: 'Financial Stability Risk',           desc: 'Risk that financial challenges could affect your ability to deliver consistently.' },
+  { id: 'risk_delivery',    label: 'Delivery / On-Time History',         desc: 'Reliability of meeting agreed delivery dates and schedules.' },
+  { id: 'risk_quality',     label: 'Quality History',                    desc: 'Consistency of meeting specifications, QC performance, and defect trends.' },
+  { id: 'risk_leadtime',    label: 'Lead Time / Supply Chain Complexity', desc: 'Potential delays caused by long lead times, multi-tier supply chains, or logistics.' },
+  { id: 'risk_technical',   label: 'Technical Complexity',               desc: 'How technically challenging the product or service is and associated execution risks.' },
+  { id: 'risk_singlesrc',   label: 'Single-Source / Replaceability',     desc: 'How difficult it would be to replace or dual-source this product/service if disrupted.' }
+];
+
+// ═══════════════════════════════════════════════════════════
+//  QUESTIONNAIRE DATA  (10 groups, all Yes/No/NA)
+// ═══════════════════════════════════════════════════════════
+const QUESTIONNAIRE = [
+  { group: 'Ordering', id: 'q3', questions: [
+    { id:'q3_1', text:'Do you have an established process for receiving, verifying and processing orders from IVS?' },
+    { id:'q3_2', text:'Do you communicate / confirm back to IVS your understanding of what is expected?' },
+    { id:'q3_3', text:'When confirming the order, do you include any requirements necessary for intended use that IVS may not be aware of?' },
+    { id:'q3_4', text:'Do you have a process to communicate availability, delivery, and support?' }
+  ]},
+  { group: 'Inspection', id: 'q4', questions: [
+    { id:'q4_1', text:'Are there documented inspection and testing instructions established, implemented, and maintained (what to inspect, frequency, method, tools, accept/reject, disposition, release)?' },
+    { id:'q4_2', text:'Is in-process material/product inspected and/or tested to assure it meets all specifications including customer expectations?' },
+    { id:'q4_3', text:'Is there a final inspection & test program for final acceptance prior to release?' },
+    { id:'q4_4', text:'Are records maintained of inspections and tests performed?' }
+  ]},
+  { group: 'Material / Product ID', id: 'q5', questions: [
+    { id:'q5_1', text:'Are there documented inspection and testing instructions for material/product identification?' },
+    { id:'q5_2', text:'Is in-process material inspected and/or tested to assure it meets all specifications?' },
+    { id:'q5_3', text:'Is there a final inspection & test program for final acceptance prior to release?' },
+    { id:'q5_4', text:'Are records maintained of inspections and tests performed?' }
+  ]},
+  { group: 'Records', id: 'q6', questions: [
+    { id:'q6_1', text:'Are records maintained for essential inspections and tests?' },
+    { id:'q6_2', text:'Are records available for customer review?' },
+    { id:'q6_3', text:'Is there a retention period for all records?' },
+    { id:'q6_4', text:'Are records maintained of inspections and tests performed?' }
+  ]},
+  { group: 'Personnel Qualification', id: 'q7', questions: [
+    { id:'q7_1', text:'Do you specify the educational, training, skills and experience requirements for personnel involved in the Quality Program?' },
+    { id:'q7_2', text:'Do you determine and document the competence of personnel involved in the Quality Program?' }
+  ]},
+  { group: 'Measurement & Calibration', id: 'q8', questions: [
+    { id:'q8_1', text:'Is there a program to determine the accuracy, reproducibility, and repeatability of gauges and test equipment?' },
+    { id:'q8_2', text:'Do procedures exist which address the quality of product and the validity of previous inspections when a gauge is found out of calibration?' },
+    { id:'q8_3', text:'Is corrective action taken immediately to correct gauge and test equipment problems?' },
+    { id:'q8_4', text:'If gauges are calibrated, is the frequency established to industry standards? (Specify frequency):', extra: 'text', extraId: 'q8_4_freq', extraLabel:'Calibration frequency' },
+    { id:'q8_5', text:'Are gauges and standards used for calibration traceable to a national or internationally recognized standard?' }
+  ]},
+  { group: 'Corrective Actions', id: 'q9', questions: [
+    { id:'q9_1', text:'Do you have a system which detects problems and promptly invokes corrective action?' },
+    { id:'q9_2', text:'Is corrective action assessed for its effectiveness in preventing reoccurrence?' },
+    { id:'q9_3', text:'Do you utilize trend analysis to identify recurring problems?' }
+  ]},
+  { group: 'Document Control', id: 'q10', questions: [
+    { id:'q10_1', text:'Is a system in place to ensure that only the latest applicable documents are available to personnel?' },
+    { id:'q10_2', text:'Are drawings and procedures reviewed/approved prior to release?' },
+    { id:'q10_3', text:'Are obsolete drawings, specifications, and instructions removed from use?' }
+  ]},
+  { group: 'Purchasing', id: 'q11', questions: [
+    { id:'q11_1', text:'Are documented procedures implemented that describe your purchasing process?' },
+    { id:'q11_2', text:'Do procedures provide for review of procurement documents for accuracy, completeness and compliance with customer/contractor requirements?' },
+    { id:'q11_3', text:'Does your company perform evaluations of their own suppliers?' },
+    { id:'q11_4', text:'Is there a system to assure that purchased material/products/services meets all requirements?' }
+  ]},
+  { group: 'Handling, Storage & Shipping', id: 'q12', questions: [
+    { id:'q12_1', text:'Is material stored and protected to prevent deterioration and damage?' },
+    { id:'q12_2', text:'Is material that is subject to corrosion treated or preserved?' },
+    { id:'q12_3', text:'Are products packaged to prevent deterioration, corrosion, contamination or damage during shipping?' },
+    { id:'q12_4', text:'Do you have inspection checklists or controls to assure material being shipped meets customer requirements?' }
+  ]}
+];
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildRiskMatrix();
+  buildQuestionnaire();
+  setupSignature();
+
+  // Auto-fill today's date
+  const today = new Date();
+  document.getElementById('form_date').value =
+    String(today.getMonth()+1).padStart(2,'0') + '/' +
+    String(today.getDate()).padStart(2,'0') + '/' + today.getFullYear();
+
+  // PREFILL_DATA is embedded by bridge.py — always present (at minimum vendor name + supplier number)
+  const prefillRaw = typeof PREFILL_DATA !== 'undefined' ? PREFILL_DATA : null;
+  const isRenewal = prefillRaw && prefillRaw._is_renewal;
+
+  // Show the correct welcome instructions
+  document.getElementById('welcome-new').style.display     = isRenewal ? 'none'  : 'block';
+  document.getElementById('welcome-renewal').style.display = isRenewal ? 'block' : 'none';
+
+  if (prefillRaw) {
+    state.prefill = prefillRaw;
+    // Always pre-populate supplier number (and company name for renewals)
+    if (prefillRaw._supplier_number) {
+      const snEl = document.getElementById('supplier_number');
+      if (snEl) snEl.value = prefillRaw._supplier_number;
+    }
+    if (prefillRaw._vendor_name) {
+      const cnEl = document.getElementById('company_name');
+      if (cnEl && !cnEl.value) cnEl.value = prefillRaw._vendor_name;
+    }
+    if (isRenewal) applyPrefill(prefillRaw);
+  }
+});
+
+function startForm() {
+  navigateTo('page-class');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  state.currentPage = pageId;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+}
+
+function goBack() {
+  if (state.pageHistory.length > 0) {
+    showPage(state.pageHistory.pop());
+  }
+}
+
+function navigateTo(pageId) {
+  state.pageHistory.push(state.currentPage);
+  showPage(pageId);
+}
+
+function updateProgress() {
+  const labels = {
+    'page-welcome':       { pct: 0,   label: 'Instructions' },
+    'page-class':         { pct: 10,  label: 'Step 1 — What do you supply to IVS?' },
+    'page-info':          { pct: 30,  label: 'Step 2 — Company Information' },
+    'page-questionnaire': { pct: 55,  label: 'Step 3 — Quality System Questionnaire' },
+    'page-risk':          { pct: 75,  label: 'Step 4 — Risk Assessment' },
+    'page-declare':       { pct: 90,  label: 'Final Step — Declaration & Signature' },
+    'page-success':       { pct: 100, label: 'Complete!' }
+  };
+  const p = labels[state.currentPage] || { pct: 0, label: '' };
+  document.getElementById('progressFill').style.width = p.pct + '%';
+  document.getElementById('progressLabel').textContent = p.label;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CLASSIFICATION PAGE — product/service based
+// ═══════════════════════════════════════════════════════════
+
+// Wire up checkbox visual feedback and Other text reveal
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.product-option input[type=checkbox]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const label = chk.closest('.product-option');
+      const cls = label ? label.dataset.class : '';
+      label.classList.toggle('checked', chk.checked);
+      label.classList.toggle('checked-critical', chk.checked && cls === 'critical');
+      if (chk.id === 'chk_other') {
+        document.getElementById('other_product_text').style.display = chk.checked ? 'block' : 'none';
+      }
+      updateClassResult();
+    });
+  });
+});
+
+function updateClassResult() {
+  const checked = [...document.querySelectorAll('.product-option input[type=checkbox]:checked')];
+  const resultEl = document.getElementById('class-result');
+  if (!checked.length) { resultEl.style.display = 'none'; return; }
+  const hasCritical = checked.some(c => c.closest('.product-option').dataset.class === 'critical');
+  const hasNC       = checked.some(c => c.closest('.product-option').dataset.class === 'noncritical');
+  const allExempt   = checked.every(c => c.closest('.product-option').dataset.class === 'exempt');
+  let cls, label;
+  if (hasCritical)      { cls = 'critical';    label = '⚙️ Classified as <strong>Critical</strong> — full qualification required'; resultEl.style.background='#fef2f2'; resultEl.style.color='#991b1b'; resultEl.style.border='1px solid #f87171'; }
+  else if (hasNC)       { cls = 'noncritical'; label = '📦 Classified as <strong>Non-Critical</strong>'; resultEl.style.background='#f1f5f9'; resultEl.style.color='#334155'; resultEl.style.border='1px solid #cbd5e1'; }
+  else if (allExempt)   { cls = 'exempt';      label = '📋 Classified as <strong>Exempt</strong> — minimal form required'; resultEl.style.background='#f1f5f9'; resultEl.style.color='#475569'; resultEl.style.border='1px solid #cbd5e1'; }
+  state.classification = cls;
+  resultEl.innerHTML = label;
+  resultEl.style.display = 'block';
+  document.getElementById('class-error').style.display = 'none';
+}
+
+function submitClassification() {
+  const checked = [...document.querySelectorAll('.product-option input[type=checkbox]:checked')];
+  if (!checked.length) {
+    document.getElementById('class-error').style.display = 'block';
+    return;
+  }
+  // Collect selected product strings
+  state.selectedProducts = checked.map(c => {
+    if (c.id === 'chk_other') {
+      const txt = document.getElementById('other_product_text').value.trim();
+      return txt ? `Other: ${txt}` : 'Other';
+    }
+    return c.value;
+  });
+
+  // Show/hide info page sections based on resolved classification
+  const isCritOrNC = state.classification === 'critical' || state.classification === 'noncritical';
+  document.getElementById('block_cert').classList.toggle('hidden', !isCritOrNC);
+  document.getElementById('block_locations').classList.toggle('hidden', state.classification !== 'critical');
+
+  // Update step labels
+  const exempt = state.classification === 'exempt';
+  document.getElementById('info-step-label').textContent = exempt ? 'Step 2 of 3' : 'Step 2 of 4';
+
+  navigateTo('page-info');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COMPANY INFO PAGE
+// ═══════════════════════════════════════════════════════════
+function submitInfo() {
+  const required = [
+    { id:'company_name', label:'Company Name' },
+    { id:'form_date', label:'Date' },
+    { id:'completed_by', label:'Completed By / QA Contact' },
+    { id:'email', label:'Email' }
+  ];
+
+  let ok = true;
+  required.forEach(f => {
+    const el = document.getElementById(f.id);
+    el.style.borderColor = '';
+    if (!el.value.trim()) {
+      el.style.borderColor = 'var(--danger)';
+      ok = false;
+    }
+  });
+
+  if (!ok) { alert('Please fill in all required fields before continuing.'); return; }
+
+  // For critical/NC require cert answer
+  const isCritOrNC = state.classification === 'critical' || state.classification === 'noncritical';
+  if (isCritOrNC && !document.querySelector('#pills_has_cert .selected-yes, #pills_has_cert .selected-no')) {
+    alert('Please answer the quality certification question.'); return;
+  }
+
+  const hasCertPill = document.querySelector('#pills_has_cert .pill.selected-yes');
+  state.hasCert = hasCertPill ? true : false;
+
+  // New order: exempt → declare. Critical+no cert → questionnaire → risk → declare.
+  // Everyone else (NC, critical+cert) → risk → declare.
+  if (state.classification === 'exempt') {
+    navigateTo('page-declare');
+  } else if (state.classification === 'critical' && !state.hasCert) {
+    navigateTo('page-questionnaire');
+  } else {
+    navigateTo('page-risk');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PILL TOGGLE
+// ═══════════════════════════════════════════════════════════
+function pillSelect(el, field, value) {
+  const group = el.closest('.pill-group');
+  group.querySelectorAll('.pill').forEach(p => {
+    p.classList.remove('selected-yes','selected-no','selected-na','selected-opt');
+  });
+  if (value === 'Yes') el.classList.add('selected-yes');
+  else if (value === 'No') el.classList.add('selected-no');
+  else if (value === 'N/A') el.classList.add('selected-na');
+  else el.classList.add('selected-opt');
+
+  // Show/hide conditional blocks
+  if (field === 'name_change') {
+    document.getElementById('block_prev_name').classList.toggle('hidden', value !== 'Yes');
+  }
+  if (field === 'has_cert') {
+    document.getElementById('block_cert_details').classList.toggle('hidden', value !== 'Yes');
+    state.hasCert = (value === 'Yes');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ADDITIONAL LOCATIONS
+// ═══════════════════════════════════════════════════════════
+function addLocation() {
+  state.locationCount++;
+  const n = state.locationCount;
+  const container = document.getElementById('locations_container');
+  const block = document.createElement('div');
+  block.className = 'location-block';
+  block.id = `loc_${n}`;
+  block.innerHTML = `
+    <div class="loc-title">Additional Location ${n}</div>
+    <button class="remove-loc" onclick="removeLocation(${n})">✕</button>
+    <div class="row-2">
+      <div><label>Company Name</label><input type="text" id="loc_${n}_name" placeholder="Name"></div>
+      <div><label>Contact Name</label><input type="text" id="loc_${n}_contact" placeholder="Contact"></div>
+    </div>
+    <label>Physical Address</label>
+    <input type="text" id="loc_${n}_street" placeholder="Street Address">
+    <div class="row-3" style="margin-top:8px;">
+      <input type="text" id="loc_${n}_city" placeholder="City">
+      <input type="text" id="loc_${n}_state" placeholder="State">
+      <input type="text" id="loc_${n}_zip" placeholder="ZIP">
+    </div>
+    <div class="row-2">
+      <div><label>Phone</label><input type="tel" id="loc_${n}_phone" placeholder="(000) 000-0000"></div>
+      <div><label>Email</label><input type="email" id="loc_${n}_email" placeholder="contact@company.com"></div>
+    </div>
+    <div class="row-2">
+      <div><label>Responsible — Manufacturing</label><input type="text" id="loc_${n}_mfg" placeholder="Name / Email"></div>
+      <div><label>Responsible — Quality Assurance</label><input type="text" id="loc_${n}_qa" placeholder="Name / Email"></div>
+    </div>
+    <div class="row-2">
+      <div><label>Years in Business</label><input type="text" id="loc_${n}_years" placeholder="e.g. 8"></div>
+      <div><label>Total Personnel</label><input type="text" id="loc_${n}_staff" placeholder="e.g. 20"></div>
+    </div>`;
+  container.appendChild(block);
+}
+
+function removeLocation(n) {
+  const el = document.getElementById(`loc_${n}`);
+  if (el) el.remove();
+}
+
+function collectLocations() {
+  const locs = [];
+  document.querySelectorAll('.location-block').forEach(b => {
+    const n = b.id.replace('loc_','');
+    const loc = {};
+    ['name','contact','street','city','state','zip','phone','email','mfg','qa','years','staff'].forEach(f => {
+      const el = document.getElementById(`loc_${n}_${f}`);
+      if (el) loc[f] = el.value.trim();
+    });
+    if (loc.name || loc.street) locs.push(loc);
+  });
+  return locs;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RISK MATRIX
+// ═══════════════════════════════════════════════════════════
+function buildRiskMatrix() {
+  const tbody = document.getElementById('riskTableBody');
+  RISK_FACTORS.forEach(f => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong>${f.label}</strong><br><span style="color:var(--sub);font-size:0.77rem;">${f.desc}</span></td>` +
+      [1,2,3,4,5].map(v =>
+        `<td class="center" onclick="selectRisk('${f.id}',${v},this)" data-factor="${f.id}" data-val="${v}">${v}</td>`
+      ).join('');
+    tbody.appendChild(tr);
+  });
+}
+
+function selectRisk(factorId, value, cell) {
+  document.querySelectorAll(`td[data-factor="${factorId}"]`).forEach(c => c.classList.remove('chosen'));
+  cell.classList.add('chosen');
+  state.riskScores[factorId] = value;
+}
+
+function submitRisk() {
+  const incomplete = RISK_FACTORS.filter(f => !state.riskScores[f.id]);
+  if (incomplete.length > 0) {
+    document.getElementById('risk-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('risk-error').style.display = 'none';
+
+  // Risk is always the last section — always goes to declare
+  navigateTo('page-declare');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  QUESTIONNAIRE
+// ═══════════════════════════════════════════════════════════
+function buildQuestionnaire() {
+  const container = document.getElementById('questionnaireContent');
+  QUESTIONNAIRE.forEach(group => {
+    const section = document.createElement('div');
+    section.style.marginBottom = '24px';
+    section.innerHTML = `<div style="font-weight:800;font-size:0.95rem;color:var(--primary);padding:8px 0 6px;border-bottom:2px solid var(--border);margin-bottom:8px;">${group.group}</div>`;
+
+    group.questions.forEach(q => {
+      const row = document.createElement('div');
+      row.className = 'audit-q';
+      row.innerHTML = `
+        <div class="q-text">${q.text}
+          ${q.extra === 'text' ? `<div class="cond-block hidden" id="${q.extraId}_wrap" style="margin-top:6px;"><input type="text" id="${q.extraId}" style="max-width:280px;" placeholder="${q.extraLabel||''}"></div>` : ''}
+        </div>
+        <div class="q-pills">
+          <span class="pill" onclick="auditPill(this,'${q.id}','Yes')">Yes</span>
+          <span class="pill" onclick="auditPill(this,'${q.id}','No')">No</span>
+          <span class="pill" onclick="auditPill(this,'${q.id}','N/A')">N/A</span>
+        </div>`;
+      section.appendChild(row);
+    });
+
+    // Comments box per group
+    const commentRow = document.createElement('div');
+    commentRow.style.marginTop = '8px';
+    commentRow.innerHTML = `<textarea id="q_comment_${group.id}" placeholder="Comments for ${group.group} section (required if any 'No' or 'N/A' answers above)…" style="font-size:0.83rem; min-height:52px;"></textarea>`;
+    section.appendChild(commentRow);
+
+    container.appendChild(section);
+  });
+}
+
+function auditPill(el, qId, value) {
+  const row = el.closest('.audit-q');
+  row.querySelectorAll('.pill').forEach(p => p.classList.remove('selected-yes','selected-no','selected-na'));
+  if (value === 'Yes') el.classList.add('selected-yes');
+  else if (value === 'No') el.classList.add('selected-no');
+  else el.classList.add('selected-na');
+  state.auditAnswers[qId] = value;
+
+  // For q8_4 (calibration freq): show text box when answered Yes
+  if (qId === 'q8_4') {
+    const wrap = document.getElementById('q8_4_freq_wrap');
+    if (wrap) wrap.classList.toggle('hidden', value !== 'Yes');
+  }
+}
+
+function submitQuestionnaire() {
+  // Warn if any question unanswered, but don't block
+  const total = QUESTIONNAIRE.reduce((s,g) => s + g.questions.length, 0);
+  const answered = Object.keys(state.auditAnswers).length;
+  if (answered < total) {
+    if (!confirm(`${total - answered} question(s) are unanswered. Continue anyway?`)) return;
+  }
+  navigateTo('page-risk');  // Risk Assessment is always the last section before declaration
+}
+
+function collectAuditAnswers() {
+  const answers = { ...state.auditAnswers };
+  // Collect extra text fields
+  const freq = document.getElementById('q8_4_freq');
+  if (freq) answers['q8_4_freq'] = freq.value.trim();
+  // Collect comments
+  QUESTIONNAIRE.forEach(g => {
+    const el = document.getElementById(`q_comment_${g.id}`);
+    if (el) answers[`comment_${g.id}`] = el.value.trim();
+  });
+  return answers;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FILE HANDLING
+// ═══════════════════════════════════════════════════════════
+function handleFileSelect(input, listId) {
+  Array.from(input.files).forEach(f => addFile(f, listId));
+  input.value = '';
+}
+
+function handleFileDrop(event, listId) {
+  event.preventDefault();
+  document.getElementById('certDropZone').classList.remove('dragover');
+  Array.from(event.dataTransfer.files).forEach(f => addFile(f, listId));
+}
+
+function addFile(file, listId) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.files[listId] = state.files[listId] || [];
+    state.files[listId].push({ name: file.name, type: file.type, data: e.target.result });
+    renderFileList(listId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderFileList(listId) {
+  const container = document.getElementById(listId);
+  container.innerHTML = '';
+  (state.files[listId] || []).forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `<span>📄 ${f.name}</span><button onclick="removeFile('${listId}',${i})">✕</button>`;
+    container.appendChild(item);
+  });
+}
+
+function removeFile(listId, idx) {
+  state.files[listId].splice(idx, 1);
+  renderFileList(listId);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SIGNATURE PAD
+// ═══════════════════════════════════════════════════════════
+function setupSignature() {
+  const canvas = document.getElementById('sigCanvas');
+  canvas.width = canvas.offsetWidth || 600;
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * (canvas.width / r.width), y: (src.clientY - r.top) * (canvas.height / r.height) };
+  };
+
+  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.stroke(); });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.stroke(); }, { passive: false });
+  canvas.addEventListener('touchend', () => drawing = false);
+}
+
+function clearSig() {
+  const canvas = document.getElementById('sigCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+let sigMode = 'draw';  // 'draw' | 'type'
+
+function setSigMode(mode) {
+  sigMode = mode;
+  document.getElementById('sig-draw-area').style.display = mode === 'draw' ? 'block' : 'none';
+  document.getElementById('sig-type-area').style.display = mode === 'type' ? 'block' : 'none';
+  document.getElementById('sig-tab-draw').className = mode === 'draw' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('sig-tab-draw').style.cssText = 'padding:7px 16px;font-size:0.82rem;';
+  document.getElementById('sig-tab-type').className = mode === 'type' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('sig-tab-type').style.cssText = 'padding:7px 16px;font-size:0.82rem;';
+}
+
+function renderTypedSig() {
+  const name = document.getElementById('sig_typed').value;
+  document.getElementById('sig-typed-preview').textContent = name;
+}
+
+function getTypedSigDataURL() {
+  const name = document.getElementById('sig_typed').value.trim();
+  const canvas = document.createElement('canvas');
+  canvas.width = 500; canvas.height = 80;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 500, 80);
+  ctx.font = '42px "Brush Script MT", cursive';
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText(name, 10, 58);
+  return canvas.toDataURL('image/png');
+}
+
+function isSigEmpty() {
+  if (sigMode === 'type') {
+    return !(document.getElementById('sig_typed').value.trim());
+  }
+  const canvas = document.getElementById('sigCanvas');
+  const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+  return !data.some(v => v !== 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GENERATE PACKAGE & DOWNLOAD
+// ═══════════════════════════════════════════════════════════
+function generatePackage() {
+  // Validate declare page
+  const name = document.getElementById('declare_name').value.trim();
+  const title = document.getElementById('declare_title').value.trim();
+  if (!name || !title) { alert('Please enter your name and title.'); return; }
+  if (isSigEmpty()) {
+    document.getElementById('sig-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('sig-error').style.display = 'none';
+
+  const sigData = sigMode === 'type' ? getTypedSigDataURL() : document.getElementById('sigCanvas').toDataURL('image/png');
+  const sigTypedName = sigMode === 'type' ? document.getElementById('sig_typed').value.trim() : '';
+
+  // Compute risk
+  const riskTotal = Object.values(state.riskScores).reduce((s, v) => s + v, 0);
+  const riskMax = RISK_FACTORS.length * 5;
+  const riskPct = Math.round((riskTotal / riskMax) * 100);
+  const riskLevel = riskPct <= 33 ? 'Low' : riskPct <= 60 ? 'Medium' : 'High';
+
+  // Auto-detect classification from cert status
+  let detectedType = state.classification === 'critical' ? 'Critical' :
+                     state.classification === 'noncritical' ? 'Non-Critical' : 'Exempt';
+
+  const pkg = {
+    _format: 'IVS-SQ01-v1',
+    submitted_date: new Date().toISOString(),
+    classification: detectedType,
+    selected_products: state.selectedProducts || [],
+    has_cert: state.hasCert,
+    risk_score: riskTotal,
+    risk_max: riskMax,
+    risk_pct: riskPct,
+    risk_level: riskLevel,
+    risk_scores: state.riskScores,
+    company: {
+      name: document.getElementById('company_name').value.trim(),
+      supplier_number: document.getElementById('supplier_number').value.trim(),
+      date: document.getElementById('form_date').value.trim(),
+      completed_by: document.getElementById('completed_by').value.trim(),
+      completed_by_title: document.getElementById('completed_by_title').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      name_change: getPillValue('pills_name_change'),
+      prev_name: document.getElementById('prev_name').value.trim(),
+      cert_list: document.getElementById('cert_list').value.trim(),
+    },
+    additional_locations: collectLocations(),
+    risk_comments: document.getElementById('risk_comments').value.trim(),
+    audit_answers: state.classification === 'critical' && !state.hasCert ? collectAuditAnswers() : {},
+    declaration: { name, title, sig_data: sigData, sig_type: sigMode, sig_typed_name: sigTypedName, date: new Date().toLocaleDateString('en-US') },
+    cert_files: state.files.certFiles || [],
+    // IVS approval fields (blank — filled by QM in portal)
+    ivs_approval: {
+      status: '', approved_by: '', approval_date: '', expiration_date: '',
+      method_primary: '', method_secondary: '', denial_reason: '', notes: '',
+      qm_sig_data: '', qm_password_verified: false
+    }
+  };
+
+  // Serialize and download
+  const blob = new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeName = pkg.company.name.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
+  const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.href = url;
+  a.download = `SQ-01_${safeName}_${dateStr}.json`;
+  // Store filename for mailto link
+  state._lastDownloadFile = `SQ-01_${safeName}_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  navigateTo('page-success');
+}
+
+function openMailto(e) {
+  e.preventDefault();
+  const fname = state._lastDownloadFile || 'your .json file';
+  const subject = encodeURIComponent('SQ-01 Supplier Qualification Submission');
+  const body = encodeURIComponent(
+    'Hello,\n\nPlease find my completed SQ-01 Supplier Qualification Assessment attached (' + fname + ').\n\nThank you.'
+  );
+  window.location.href = `mailto:qaqc@infinityvalve.com?subject=${subject}&body=${body}`;
+}
+
+function getPillValue(groupId) {
+  const sel = document.querySelector(`#${groupId} .pill.selected-yes, #${groupId} .pill.selected-no, #${groupId} .pill.selected-na, #${groupId} .pill.selected-opt`);
+  if (!sel) return '';
+  if (sel.classList.contains('selected-yes')) return 'Yes';
+  if (sel.classList.contains('selected-no')) return 'No';
+  if (sel.classList.contains('selected-na')) return 'N/A';
+  return sel.textContent.trim();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PREFILL (for renewals)
+// ═══════════════════════════════════════════════════════════
+function applyPrefill(d) {
+  if (!d || !d.company) return;
+  const c = d.company;
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+  set('company_name', c.name); set('address_street', c.address_street);
+  set('address_city', c.address_city); set('address_state', c.address_state);
+  set('address_zip', c.address_zip); set('phone', c.phone); set('fax', c.fax);
+  set('website', c.website); set('completed_by', c.completed_by);
+  set('completed_by_title', c.completed_by_title); set('email', c.email);
+  set('resp_mfg', c.resp_mfg); set('resp_qa', c.resp_qa);
+  set('years_biz', c.years_biz); set('total_personnel', c.total_personnel);
+  set('products_services', c.products_services); set('cert_list', c.cert_list);
+  set('prev_name', c.prev_name);
+
+  const banner = document.createElement('div');
+  banner.className = 'info-banner';
+  banner.style.margin = '16px 30px';
+  banner.innerHTML = '🔄 <strong>Renewal:</strong> Your previous submission has been pre-filled. Please review and update any changed information before submitting.';
+  document.querySelector('.header').after(banner);
+}
+
+// Placeholder — bridge.py replaces this when generating renewal HTML
+const PREFILL_DATA = null;
+</script>
+</body>
+</html>
