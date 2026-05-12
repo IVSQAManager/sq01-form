@@ -506,17 +506,11 @@
 <div class="page" id="page-success">
   <div class="card success-box">
     <div class="check">✅</div>
-    <h2>Thank You!</h2>
-    <p>Your Supplier Qualification Assessment has been successfully generated and downloaded as a <strong>.json</strong> file.</p>
-    <p>Please click the below email to open a pre-filled email and attach the downloaded file to it:<br>
-    <a id="mailto-link" href="#" onclick="openMailto(event)"
-       style="font-size:1.1rem;font-weight:800;color:var(--accent);text-decoration:none;">
-      📧 qaqc@infinityvalve.com
-    </a></p>
-    <p style="font-size:0.9rem;color:var(--sub);">Our Quality Management Team will review your submission. If any further information is required or if there is an issue with the form, we will contact you within 5–10 business days. <em>(Please note: Approved suppliers are not typically notified.)</em></p>
-    <p style="font-size:0.8rem;color:var(--sub);margin-top:10px;">Keep a copy of the downloaded file for your records. Do not modify it — altered files cannot be imported into our system.</p>
-    <div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.82rem;color:#1d4ed8;">
-      <strong>Tip:</strong> Clicking the email address above will open your default email app with the address pre-filled. Simply attach the <strong>.json</strong> file that was just downloaded and send.
+    <h2>Submission Received!</h2>
+    <p>Your Supplier Qualification Assessment has been successfully submitted to Infinity Valve &amp; Supply.</p>
+    <p style="font-size:0.9rem;color:var(--sub);">Our Quality Management Team will review your submission. If any further information is required, we will contact you at the email address you provided within 5–10 business days. <em>(Please note: Approved suppliers are not typically notified.)</em></p>
+    <div style="margin-top:16px;padding:12px 16px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;font-size:0.85rem;color:#065f46;">
+      You do not need to send any files by email. Your submission has been received and is being processed.
     </div>
   </div>
 </div>
@@ -1103,9 +1097,11 @@ function isSigEmpty() {
 }
 
 // ═══════════════════════════════════════════════════════════
-//  GENERATE PACKAGE & DOWNLOAD
+//  SUBMIT — POST directly to IVS Flask server
 // ═══════════════════════════════════════════════════════════
-function generatePackage() {
+const SUBMIT_URL = 'https://courier-strain-indicate-encounter.trycloudflare.com/api/ingest_sq01';
+
+async function generatePackage() {
   // Validate declare page
   const name = document.getElementById('declare_name').value.trim();
   const title = document.getElementById('declare_title').value.trim();
@@ -1125,7 +1121,6 @@ function generatePackage() {
   const riskPct = Math.round((riskTotal / riskMax) * 100);
   const riskLevel = riskPct <= 33 ? 'Low' : riskPct <= 60 ? 'Medium' : 'High';
 
-  // Auto-detect classification from cert status
   let detectedType = state.classification === 'critical' ? 'Critical' :
                      state.classification === 'noncritical' ? 'Non-Critical' : 'Exempt';
 
@@ -1156,7 +1151,6 @@ function generatePackage() {
     audit_answers: state.classification === 'critical' && !state.hasCert ? collectAuditAnswers() : {},
     declaration: { name, title, sig_data: sigData, sig_type: sigMode, sig_typed_name: sigTypedName, date: new Date().toLocaleDateString('en-US') },
     cert_files: state.files.certFiles || [],
-    // IVS approval fields (blank — filled by QM in portal)
     ivs_approval: {
       status: '', approved_by: '', approval_date: '', expiration_date: '',
       method_primary: '', method_secondary: '', denial_reason: '', notes: '',
@@ -1164,19 +1158,26 @@ function generatePackage() {
     }
   };
 
-  // Serialize and download
-  const blob = new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const safeName = pkg.company.name.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
-  const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  a.href = url;
-  a.download = `SQ-01_${safeName}_${dateStr}.json`;
-  state._lastDownloadFile = `SQ-01_${safeName}_${dateStr}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  // Show submitting state
+  const submitBtn = document.querySelector('#page-declare .btn-success');
+  const origText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '⏳ Submitting…';
 
-  navigateTo('page-success');
+  try {
+    const res = await fetch(SUBMIT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pkg)
+    });
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error || 'Submission failed.');
+    navigateTo('page-success');
+  } catch (err) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = origText;
+    alert('Submission failed: ' + err.message + '\n\nPlease try again or contact qaqc@infinityvalve.com.');
+  }
 }
 
 function openMailto(e) {
