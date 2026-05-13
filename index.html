@@ -643,6 +643,19 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     if (isRenewal) applyPrefill(prefillRaw);
   }
+
+  // Read vendor name and supplier number from URL query params (set by the email link)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlVendor = urlParams.get('vendor');
+  const urlSN     = urlParams.get('sn');
+  if (urlVendor) {
+    const cnEl = document.getElementById('company_name');
+    if (cnEl && !cnEl.value) cnEl.value = decodeURIComponent(urlVendor);
+  }
+  if (urlSN) {
+    const snEl = document.getElementById('supplier_number');
+    if (snEl && !snEl.value) snEl.value = decodeURIComponent(urlSN);
+  }
 });
 
 function startForm() {
