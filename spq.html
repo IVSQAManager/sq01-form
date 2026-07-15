@@ -123,7 +123,7 @@
 <div class="header">
   <div class="header-text">
     <h1>Infinity Valve &amp; Supply</h1>
-    <p>SPQ-01 &mdash; Special Process Questionnaire &nbsp;|&nbsp; Rev. 1 &nbsp;|&nbsp; 07-15-2026</p>
+    <p>SPQ-01 &mdash; External Special Process Questionnaire &nbsp;|&nbsp; Rev. 1 &nbsp;|&nbsp; 07-15-2026</p>
     <p style="font-size:0.7rem;opacity:0.5;margin:0;">Supersedes: Form 9.0-1 Rev. 0 (06-27-2018)</p>
   </div>
 </div>
@@ -361,7 +361,7 @@
   <div class="card">
     <div class="section-tag">Section 4</div>
     <h2>Supporting Evidence</h2>
-    <p class="desc">Upload any relevant supporting documentation. Acceptable documents include personnel certifications/qualifications, written process procedures, qualification records, or approved vendor lists. Files are transmitted securely — max 10 MB per file.</p>
+    <p class="desc">Upload any relevant supporting documentation. Acceptable documents include personnel certifications/qualifications, written process procedures, qualification records, or approved vendor lists. Files are transmitted securely — max 50 MB per file.</p>
 
     <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
       <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
@@ -491,7 +491,7 @@ fileInput.addEventListener('change', function() { addFiles(this.files); this.val
 
 function addFiles(files) {
   Array.from(files).forEach(function(f) {
-    if (f.size > 10 * 1024 * 1024) { alert(f.name + ' exceeds 10 MB limit.'); return; }
+    if (f.size > 50 * 1024 * 1024) { alert(f.name + ' exceeds 50 MB limit.'); return; }
     var reader = new FileReader();
     reader.onload = function(ev) {
       var b64 = ev.target.result.split(',')[1];
