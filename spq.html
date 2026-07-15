@@ -432,6 +432,15 @@ const evidenceFiles = [];
   const p = new URLSearchParams(window.location.search);
   if (p.get('vendor')) document.getElementById('company_name').value = p.get('vendor');
   if (p.get('sn')) document.getElementById('supplier_number').value = p.get('sn');
+  if (p.get('proc')) {
+    var requested = p.get('proc').split(',').map(function(s) { return s.trim(); });
+    document.querySelectorAll('input[name="special_process"]').forEach(function(chk) {
+      if (requested.indexOf(chk.value) !== -1) {
+        chk.checked = true;
+        chk.dispatchEvent(new Event('change'));
+      }
+    });
+  }
   // Auto-fill date to today
   const today = new Date();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
