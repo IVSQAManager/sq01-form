@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPQ-01 Special Process Questionnaire — Infinity Valve &amp; Supply</title>
+<style>
+  :root {
+    --primary: #0f172a; --accent: #0ea5e9; --success: #10b981;
+    --danger: #ef4444; --warn: #f59e0b; --border: #e2e8f0;
+    --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --sub: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+
+  .header { background: var(--primary); color: white; padding: 16px 30px; display: flex; align-items: center; gap: 16px; }
+  .header-text h1 { margin: 0; font-size: 1.2rem; font-weight: 800; }
+  .header-text p { margin: 2px 0 0; font-size: 0.8rem; opacity: 0.7; }
+
+  .form-band { background: #1e293b; padding: 8px 30px; display: flex; align-items: center; justify-content: space-between; }
+  .form-band .band-title { color: rgba(255,255,255,0.85); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.03em; }
+  .form-band .band-sub { color: rgba(255,255,255,0.45); font-size: 0.72rem; }
+
+  .page { max-width: 760px; margin: 30px auto; padding: 0 16px 60px; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+  .section-tag { display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; }
+  .card h2 { margin: 0 0 4px; font-size: 1.2rem; }
+  .card p.desc { margin: 0 0 20px; color: var(--sub); font-size: 0.9rem; line-height: 1.5; }
+
+  label { display: block; font-weight: 600; font-size: 0.88rem; margin: 14px 0 4px; color: var(--text); }
+  label .req { color: var(--danger); margin-left: 2px; }
+
+  input[type=text], input[type=email], select, textarea {
+    width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 6px;
+    font-size: 0.95rem; font-family: inherit; outline: none; color: var(--text); background: white;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 60px; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:560px) { .row-2 { grid-template-columns: 1fr; } }
+
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .pill { padding: 7px 18px; border: 2px solid var(--border); border-radius: 99px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; background: white; color: var(--sub); transition: 0.15s; user-select: none; }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.selected-yes { border-color: var(--success); background: #ecfdf5; color: #065f46; }
+  .pill.selected-no { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+  .pill.selected-na { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
+
+  .process-option { display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+    border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.15s; background: white; margin-bottom: 8px; }
+  .process-option:hover { border-color: var(--accent); background: #f0f9ff; }
+  .process-option input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+  .process-option.checked { border-color: var(--accent); background: #e0f2fe; }
+  .opt-label { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+  .opt-sub { font-size: 0.78rem; color: var(--sub); margin-top: 2px; }
+
+  .audit-section { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 8px; }
+  .audit-q { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; background: white; }
+  .audit-q:last-child { border-bottom: none; }
+  .audit-q-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .audit-q .q-num { font-size: 0.72rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .audit-q .q-text { font-size: 0.88rem; line-height: 1.55; color: var(--text); flex: 1; }
+  .audit-q .q-pills { display: flex; gap: 6px; flex-shrink: 0; margin-top: 2px; }
+  .audit-q .q-pills .pill { padding: 5px 12px; font-size: 0.8rem; }
+  .audit-q .q-comment { margin-top: 10px; }
+  .audit-q .q-comment textarea { min-height: 50px; font-size: 0.85rem; }
+  .audit-q .q-comment label { font-size: 0.78rem; color: var(--sub); font-weight: 600; margin: 0 0 4px; }
+
+  .file-drop { border: 2px dashed var(--border); border-radius: 8px; padding: 24px; text-align: center;
+    cursor: pointer; transition: 0.2s; background: #fafbfc; }
+  .file-drop:hover, .file-drop.dragover { border-color: var(--accent); background: #e0f2fe; }
+  .file-drop input { display: none; }
+  .file-drop .drop-icon { font-size: 2rem; margin-bottom: 8px; }
+  .file-drop p { margin: 0; font-size: 0.85rem; color: var(--sub); }
+  .file-drop .drop-cta { font-weight: 700; color: var(--accent); }
+  .file-list { margin-top: 10px; }
+  .file-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px;
+    background: #f1f5f9; border-radius: 6px; margin-top: 5px; font-size: 0.85rem; }
+  .file-item button { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1rem; line-height: 1; }
+
+  .declaration-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 14px; font-size: 0.85rem; color: var(--sub); line-height: 1.6; }
+
+  .btn { padding: 12px 28px; border-radius: 7px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
+    border: none; transition: 0.2s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #0284c7; }
+  .btn-success { background: var(--success); color: white; width: 100%; font-size: 1rem; padding: 15px; margin-top: 10px; }
+  .btn-success:hover { background: #059669; }
+  .btn-success:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .error-msg { color: var(--danger); font-size: 0.8rem; margin-top: 4px; display: none; }
+  .field-error input, .field-error textarea { border-color: var(--danger) !important; }
+  .field-error .error-msg { display: block; }
+
+  .info-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;
+    font-size: 0.85rem; color: #1d4ed8; margin-bottom: 20px; line-height: 1.5; }
+
+  .hidden { display: none !important; }
+
+  /* Success screen */
+  #page-success { display: none; }
+  #page-success.active { display: block; }
+  .success-box { text-align: center; padding: 60px 20px; }
+  .success-box .check { font-size: 4.5rem; margin-bottom: 16px; }
+  .success-box h2 { font-size: 1.6rem; margin-bottom: 10px; }
+  .success-box p { color: var(--sub); margin-bottom: 0; line-height: 1.6; max-width: 500px; margin: 0 auto; }
+
+  /* Submitting spinner */
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .req-note { font-size: 0.8rem; color: var(--sub); margin-bottom: 16px; }
+  .req-note span { color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-text">
+    <h1>Infinity Valve &amp; Supply</h1>
+    <p>SPQ-01 &mdash; Special Process Questionnaire &nbsp;|&nbsp; Rev. 1 &nbsp;|&nbsp; 07-15-2026</p>
+    <p style="font-size:0.7rem;opacity:0.5;margin:0;">Supersedes: Form 9.0-1 Rev. 0 (06-27-2018)</p>
+  </div>
+</div>
+
+<div class="form-band">
+  <span class="band-title">API Q1 10th Ed. &sect;5.6.4 &mdash; Special Process Supplier Validation</span>
+  <span class="band-sub">Confidential &mdash; IVS Quality Management</span>
+</div>
+
+<!-- Main form page -->
+<div class="page" id="page-form">
+
+  <div class="info-banner">
+    <strong>Purpose:</strong> This questionnaire is required for suppliers performing special processes on behalf of Infinity Valve &amp; Supply (IVS). It verifies that your organization meets the process validation requirements of API Q1 &sect;5.6.4. Please answer all questions honestly and upload supporting documentation where applicable.
+  </div>
+
+  <!-- SECTION 1: Company Identification -->
+  <div class="card">
+    <div class="section-tag">Section 1</div>
+    <h2>Supplier Identification</h2>
+    <p class="desc">Verify your company details below. Grayed fields are pre-assigned by IVS.</p>
+    <p class="req-note"><span>*</span> Required fields</p>
+
+    <div class="row-2">
+      <div>
+        <label>Supplier / Company Name <span class="req">*</span></label>
+        <input type="text" id="company_name" placeholder="Company name">
+        <span class="error-msg">Required</span>
+      </div>
+      <div>
+        <label>IVS Supplier Number <span style="font-size:0.75rem;color:var(--sub);">(IVS-assigned)</span></label>
+        <input type="text" id="supplier_number" readonly style="background:#f0f4f8;color:#64748b;cursor:default;" placeholder="e.g. V-0042" title="Assigned by IVS — not editable">
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div>
+        <label>Completed By <span class="req">*</span></label>
+        <input type="text" id="completed_by" placeholder="Full name">
+        <span class="error-msg">Required</span>
+      </div>
+      <div>
+        <label>Title / Role <span class="req">*</span></label>
+        <input type="text" id="completed_by_title" placeholder="Quality Manager, etc.">
+        <span class="error-msg">Required</span>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div>
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="contact@company.com">
+        <span class="error-msg">Valid email required</span>
+      </div>
+      <div>
+        <label>Date <span class="req">*</span></label>
+        <input type="text" id="form_date" placeholder="MM/DD/YYYY" maxlength="10">
+        <span class="error-msg">Required</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Special Process Identification -->
+  <div class="card">
+    <div class="section-tag">Section 2</div>
+    <h2>Special Process Identification</h2>
+    <p class="desc">Select all special process types your organization performs for IVS. Select at least one.</p>
+
+    <label class="process-option" id="opt-nde">
+      <input type="checkbox" name="special_process" value="NDE/NDT">
+      <span>
+        <div class="opt-label">NDE / NDT &mdash; Nondestructive Examination / Testing</div>
+        <div class="opt-sub">Includes magnetic particle, liquid penetrant, ultrasonic, radiographic testing</div>
+      </span>
+    </label>
+
+    <label class="process-option" id="opt-paut">
+      <input type="checkbox" name="special_process" value="Phased Array UT (PAUT)">
+      <span>
+        <div class="opt-label">Phased Array Ultrasonic Testing (PAUT)</div>
+        <div class="opt-sub">Advanced UT techniques using phased array probes</div>
+      </span>
+    </label>
+
+    <label class="process-option" id="opt-heat">
+      <input type="checkbox" name="special_process" value="Heat Treating">
+      <span>
+        <div class="opt-label">Heat Treating</div>
+        <div class="opt-sub">Annealing, normalizing, stress relieving, hardening, tempering</div>
+      </span>
+    </label>
+
+    <label class="process-option" id="opt-coat">
+      <input type="checkbox" name="special_process" value="Coating / Plating">
+      <span>
+        <div class="opt-label">Coating / Plating</div>
+        <div class="opt-sub">Electroplating, thermal spray, chemical conversion coatings, anodizing</div>
+      </span>
+    </label>
+    <div class="hidden" id="block-coat-type" style="margin-left:30px;margin-bottom:8px;">
+      <label>Specify coating/plating type <span class="req">*</span></label>
+      <input type="text" id="coating_type" placeholder="e.g. Electroless Nickel Plating (ENP)">
+    </div>
+
+    <label class="process-option" id="opt-other">
+      <input type="checkbox" name="special_process" value="Other">
+      <span>
+        <div class="opt-label">Other Special Process</div>
+        <div class="opt-sub">Any other process not listed above that requires controlled conditions and qualified personnel</div>
+      </span>
+    </label>
+    <div class="hidden" id="block-other-type" style="margin-left:30px;margin-bottom:8px;">
+      <label>Describe the special process <span class="req">*</span></label>
+      <input type="text" id="other_process" placeholder="Describe the process">
+    </div>
+
+    <div id="process-error" class="error-msg" style="display:none;margin-top:4px;">Please select at least one special process to continue.</div>
+  </div>
+
+  <!-- SECTION 3: API Q1 §5.6.4 Validation Questions -->
+  <div class="card">
+    <div class="section-tag">Section 3 &mdash; API Q1 &sect;5.6.4</div>
+    <h2>Special Process Validation</h2>
+    <p class="desc">The following questions verify that your organization maintains the required controls for special processes in accordance with API Q1 10th Edition &sect;5.6.4. Answer Yes, No, or N/A for each item. A comment is required for any <strong>No</strong> response.</p>
+
+    <div class="audit-section">
+
+      <div class="audit-q" id="aq1">
+        <div class="q-num">5.6.4 &mdash; Item 1</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization have <strong>documented requirements identifying the equipment</strong> used to perform this special process, including applicable codes, specifications, or standards?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq1','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq1','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq1','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq1-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq1_comment" placeholder="Optional — explain any limitations or add context"></textarea>
+        </div>
+        <div id="spq1-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+      <div class="audit-q" id="aq2">
+        <div class="q-num">5.6.4 &mdash; Item 2</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization have <strong>documented personnel qualification requirements</strong>, and are all personnel performing this special process currently qualified and/or certified to applicable standards?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq2','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq2','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq2','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq2-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq2_comment" placeholder="Optional — describe certification program, qualification levels, or any gaps"></textarea>
+        </div>
+        <div id="spq2-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+      <div class="audit-q" id="aq3">
+        <div class="q-num">5.6.4 &mdash; Item 3</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization maintain <strong>documented procedures</strong> specifying the methods, techniques, and operating parameters used to perform this special process?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq3','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq3','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq3','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq3-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq3_comment" placeholder="Optional — reference document numbers or describe the procedure system"></textarea>
+        </div>
+        <div id="spq3-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+      <div class="audit-q" id="aq4">
+        <div class="q-num">5.6.4 &mdash; Item 4</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization have <strong>documented acceptance criteria</strong> for this special process, including applicable codes, standards, or customer-specified requirements?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq4','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq4','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq4','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq4-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq4_comment" placeholder="Optional — list applicable codes or standards (e.g. ASNT SNT-TC-1A, AMS 2759, etc.)"></textarea>
+        </div>
+        <div id="spq4-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+      <div class="audit-q" id="aq5">
+        <div class="q-num">5.6.4 &mdash; Item 5</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization <strong>maintain records</strong> of special process activities, including equipment used, personnel performing the work, process parameters, and results?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq5','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq5','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq5','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq5-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq5_comment" placeholder="Optional — describe record retention practices or system"></textarea>
+        </div>
+        <div id="spq5-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+      <div class="audit-q" id="aq6">
+        <div class="q-num">5.6.4 &mdash; Item 6</div>
+        <div class="audit-q-header">
+          <div class="q-text">Does your organization have a <strong>documented procedure for revalidating</strong> this special process when changes occur to equipment, personnel, materials, or operating parameters?</div>
+          <div class="q-pills">
+            <span class="pill" onclick="auditPill(this,'spq6','Yes')">Yes</span>
+            <span class="pill" onclick="auditPill(this,'spq6','No')">No</span>
+            <span class="pill" onclick="auditPill(this,'spq6','N/A')">N/A</span>
+          </div>
+        </div>
+        <div class="q-comment">
+          <label>Comment <span id="spq6-comment-req" style="display:none;color:var(--danger);font-weight:800;">(Required)</span></label>
+          <textarea id="spq6_comment" placeholder="Optional — describe change control or revalidation trigger process"></textarea>
+        </div>
+        <div id="spq6-error" class="error-msg">A comment is required when the answer is No.</div>
+      </div>
+
+    </div>
+    <div id="questions-error" class="error-msg" style="margin-top:8px;">Please answer all six questions above.</div>
+  </div>
+
+  <!-- SECTION 4: Supporting Evidence -->
+  <div class="card">
+    <div class="section-tag">Section 4</div>
+    <h2>Supporting Evidence</h2>
+    <p class="desc">Upload any relevant supporting documentation. Acceptable documents include personnel certifications/qualifications, written process procedures, qualification records, or approved vendor lists. Files are transmitted securely — max 10 MB per file.</p>
+
+    <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+      <div class="drop-icon">&#128194;</div>
+      <p><span class="drop-cta">Click to upload</span> or drag files here</p>
+      <p style="font-size:0.78rem;margin-top:4px;">PDF, Word, or image files accepted</p>
+    </div>
+    <div class="file-list" id="file-list"></div>
+    <p class="req-note" style="margin-top:10px;">Evidence upload is optional but strongly recommended for expedited approval.</p>
+  </div>
+
+  <!-- SECTION 5: Declaration -->
+  <div class="card">
+    <div class="section-tag">Section 5</div>
+    <h2>Declaration</h2>
+    <p class="desc">By completing and submitting this questionnaire, the undersigned certifies the accuracy of all information provided.</p>
+
+    <div class="declaration-box">
+      I, the undersigned, certify that the information provided in this Special Process Questionnaire is accurate and complete to the best of my knowledge. I understand that this questionnaire may be used by Infinity Valve &amp; Supply, LLC as part of their supplier qualification process under API Q1 10th Edition &sect;5.6.4. I agree to notify IVS of any significant changes to the processes, equipment, personnel, or procedures described herein.
+    </div>
+
+    <div class="row-2" style="margin-top:4px;">
+      <div>
+        <label>Authorized Signature (typed name) <span class="req">*</span></label>
+        <input type="text" id="declaration_name" placeholder="Type full name to sign">
+        <span class="error-msg">Required</span>
+      </div>
+      <div>
+        <label>Title <span class="req">*</span></label>
+        <input type="text" id="declaration_title" placeholder="Title / Role">
+        <span class="error-msg">Required</span>
+      </div>
+    </div>
+
+    <div style="max-width:240px;">
+      <label>Date <span class="req">*</span></label>
+      <input type="text" id="declaration_date" placeholder="MM/DD/YYYY" maxlength="10">
+      <span class="error-msg">Required</span>
+    </div>
+
+    <div id="submit-error" class="error-msg" style="margin-top:12px;font-size:0.85rem;"></div>
+    <button class="btn btn-success" id="submit-btn" onclick="submitForm()">Submit SPQ-01</button>
+  </div>
+
+</div>
+
+<!-- Success screen -->
+<div class="page" id="page-success">
+  <div class="card">
+    <div class="success-box">
+      <div class="check">&#9989;</div>
+      <h2>Questionnaire Submitted</h2>
+      <p>Thank you. Your Special Process Questionnaire has been received by the Infinity Valve &amp; Supply Quality Management Team. A copy of your submission reference will be sent to the email address provided.</p>
+      <p style="margin-top:16px;font-size:0.82rem;">If you have questions, contact <strong>Quality Assurance</strong> at Infinity Valve &amp; Supply.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUBMIT_URL = 'https://ivs-sq01.qaqc.workers.dev/api/ingest_sq01';
+
+// State
+const responses = { spq1: '', spq2: '', spq3: '', spq4: '', spq5: '', spq6: '' };
+const evidenceFiles = [];
+
+// ── Prefill from URL params ──────────────────────────────────────────────────
+(function prefill() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('vendor')) document.getElementById('company_name').value = p.get('vendor');
+  if (p.get('sn')) document.getElementById('supplier_number').value = p.get('sn');
+  // Auto-fill date to today
+  const today = new Date();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  document.getElementById('form_date').value = mm + '/' + dd + '/' + yyyy;
+  document.getElementById('declaration_date').value = mm + '/' + dd + '/' + yyyy;
+})();
+
+// ── Process checkboxes ───────────────────────────────────────────────────────
+document.querySelectorAll('input[name="special_process"]').forEach(function(chk) {
+  chk.addEventListener('change', function() {
+    var parent = this.closest('.process-option');
+    if (this.checked) parent.classList.add('checked');
+    else parent.classList.remove('checked');
+    // Show/hide sub-fields
+    if (this.value === 'Coating / Plating') {
+      document.getElementById('block-coat-type').classList.toggle('hidden', !this.checked);
+    }
+    if (this.value === 'Other') {
+      document.getElementById('block-other-type').classList.toggle('hidden', !this.checked);
+    }
+    document.getElementById('process-error').style.display = 'none';
+  });
+});
+
+// ── Pill selection ───────────────────────────────────────────────────────────
+function auditPill(el, key, val) {
+  var parent = el.closest('.audit-q');
+  parent.querySelectorAll('.q-pills .pill').forEach(function(p) {
+    p.className = 'pill';
+  });
+  var cls = val === 'Yes' ? 'selected-yes' : val === 'No' ? 'selected-no' : 'selected-na';
+  el.classList.add(cls);
+  responses[key] = val;
+  // Show required marker on comment if No
+  var reqSpan = document.getElementById(key + '-comment-req');
+  if (reqSpan) reqSpan.style.display = val === 'No' ? 'inline' : 'none';
+  // Clear individual error
+  document.getElementById(key + '-error').style.display = 'none';
+  document.getElementById('questions-error').style.display = 'none';
+}
+
+// ── File upload ──────────────────────────────────────────────────────────────
+var dropZone = document.getElementById('file-drop-zone');
+var fileInput = document.getElementById('file-input');
+var fileList = document.getElementById('file-list');
+
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  addFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', function() { addFiles(this.files); this.value = ''; });
+
+function addFiles(files) {
+  Array.from(files).forEach(function(f) {
+    if (f.size > 10 * 1024 * 1024) { alert(f.name + ' exceeds 10 MB limit.'); return; }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var b64 = ev.target.result.split(',')[1];
+      var idx = evidenceFiles.length;
+      evidenceFiles.push({ name: f.name, data: b64, type: f.type });
+      var item = document.createElement('div');
+      item.className = 'file-item';
+      item.id = 'fi-' + idx;
+      item.innerHTML = '<span>&#128196; ' + f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)</span>'
+        + '<button type="button" onclick="removeFile(' + idx + ')" title="Remove">&#215;</button>';
+      fileList.appendChild(item);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function removeFile(idx) {
+  evidenceFiles[idx] = null;
+  var el = document.getElementById('fi-' + idx);
+  if (el) el.remove();
+}
+
+// ── Validation ───────────────────────────────────────────────────────────────
+function required(id) {
+  var el = document.getElementById(id);
+  var wrap = el.parentElement;
+  if (!el.value.trim()) {
+    wrap.classList.add('field-error');
+    return false;
+  }
+  wrap.classList.remove('field-error');
+  return true;
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(function(el) { el.classList.remove('field-error'); });
+  ['spq1','spq2','spq3','spq4','spq5','spq6'].forEach(function(k) {
+    document.getElementById(k + '-error').style.display = 'none';
+  });
+  document.getElementById('process-error').style.display = 'none';
+  document.getElementById('questions-error').style.display = 'none';
+  document.getElementById('submit-error').style.display = 'none';
+  document.getElementById('submit-error').textContent = '';
+}
+
+function validate() {
+  clearErrors();
+  var ok = true;
+
+  // Section 1
+  if (!required('company_name')) ok = false;
+  if (!required('completed_by')) ok = false;
+  if (!required('completed_by_title')) ok = false;
+  if (!required('email')) ok = false;
+  if (!required('form_date')) ok = false;
+
+  // Section 2 — at least one process
+  var procs = Array.from(document.querySelectorAll('input[name="special_process"]:checked'));
+  if (procs.length === 0) {
+    document.getElementById('process-error').style.display = 'block';
+    ok = false;
+  }
+  if (procs.some(function(p) { return p.value === 'Coating / Plating'; })) {
+    if (!document.getElementById('coating_type').value.trim()) {
+      document.getElementById('coating_type').parentElement.classList.add('field-error');
+      ok = false;
+    }
+  }
+  if (procs.some(function(p) { return p.value === 'Other'; })) {
+    if (!document.getElementById('other_process').value.trim()) {
+      document.getElementById('other_process').parentElement.classList.add('field-error');
+      ok = false;
+    }
+  }
+
+  // Section 3 — all 6 answered; comments required on No
+  var unanswered = false;
+  ['spq1','spq2','spq3','spq4','spq5','spq6'].forEach(function(k) {
+    if (!responses[k]) { unanswered = true; return; }
+    if (responses[k] === 'No' && !document.getElementById(k + '_comment').value.trim()) {
+      document.getElementById(k + '-error').style.display = 'block';
+      ok = false;
+    }
+  });
+  if (unanswered) {
+    document.getElementById('questions-error').style.display = 'block';
+    ok = false;
+  }
+
+  // Section 5
+  if (!required('declaration_name')) ok = false;
+  if (!required('declaration_title')) ok = false;
+  if (!required('declaration_date')) ok = false;
+
+  return ok;
+}
+
+// ── Submit ───────────────────────────────────────────────────────────────────
+async function submitForm() {
+  if (!validate()) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(function() {
+      var first = document.querySelector('.field-error, [style*="display: block"].error-msg');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+    return;
+  }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Submitting...';
+
+  var procs = Array.from(document.querySelectorAll('input[name="special_process"]:checked'))
+    .map(function(c) { return c.value; });
+
+  var payload = {
+    _format: 'IVS-SPQ01-v1',
+    company_name: document.getElementById('company_name').value.trim(),
+    supplier_number: document.getElementById('supplier_number').value.trim(),
+    completed_by: document.getElementById('completed_by').value.trim(),
+    completed_by_title: document.getElementById('completed_by_title').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    form_date: document.getElementById('form_date').value.trim(),
+    special_processes: procs,
+    coating_type: document.getElementById('coating_type').value.trim(),
+    other_process: document.getElementById('other_process').value.trim(),
+    responses: {
+      spq1: responses.spq1, spq1_comment: document.getElementById('spq1_comment').value.trim(),
+      spq2: responses.spq2, spq2_comment: document.getElementById('spq2_comment').value.trim(),
+      spq3: responses.spq3, spq3_comment: document.getElementById('spq3_comment').value.trim(),
+      spq4: responses.spq4, spq4_comment: document.getElementById('spq4_comment').value.trim(),
+      spq5: responses.spq5, spq5_comment: document.getElementById('spq5_comment').value.trim(),
+      spq6: responses.spq6, spq6_comment: document.getElementById('spq6_comment').value.trim()
+    },
+    evidence_files: evidenceFiles.filter(function(f) { return f !== null; }),
+    declaration_name: document.getElementById('declaration_name').value.trim(),
+    declaration_title: document.getElementById('declaration_title').value.trim(),
+    declaration_date: document.getElementById('declaration_date').value.trim()
+  };
+
+  try {
+    var resp = await fetch(SUBMIT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error('Server returned ' + resp.status);
+    // Show success
+    document.getElementById('page-form').style.display = 'none';
+    var suc = document.getElementById('page-success');
+    suc.style.display = 'block';
+    suc.classList.add('active');
+    window.scrollTo(0, 0);
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit SPQ-01';
+    var errEl = document.getElementById('submit-error');
+    errEl.textContent = 'Submission failed — please check your connection and try again. (' + err.message + ')';
+    errEl.style.display = 'block';
+  }
+}
+</script>
+
+</body>
+</html>
